@@ -1,0 +1,35 @@
+function x = gauss_elimination_pivoting(A, b)
+    n = length(b);
+    Aug = [A b]; // Augmented matrix
+    
+    // Forward elimination with partial pivoting
+    for k = 1:n-1
+        // Partial pivoting
+        [~, pivot] = max(abs(Aug(k:n, k)));
+        pivot = pivot + k - 1;
+        if pivot ~= k
+            temp = Aug(k, :);
+            Aug(k, :) = Aug(pivot, :);
+            Aug(pivot, :) = temp;
+        end
+        
+        for i = k+1:n
+            factor = Aug(i,k) / Aug(k,k);
+            Aug(i,k:n+1) = Aug(i,k:n+1) - factor * Aug(k,k:n+1);
+        end
+    end
+    
+    // Back substitution
+    x = zeros(n,1);
+    x(n) = Aug(n,n+1) / Aug(n,n);
+    for i = n-1:-1:1
+        x(i) = (Aug(i,n+1) - sum(Aug(i,i+1:n) .* x(i+1:n))) / Aug(i,i);
+    end
+end
+
+// Example Usage
+A = [2 -1 1; 3 3 9; 3 3 5];
+b = [8; 18; 20];
+x = gauss_elimination_pivoting(A, b)
+disp("Solution: ")
+disp(x)
